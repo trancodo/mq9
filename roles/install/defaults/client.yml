@@ -1,0 +1,22 @@
+vgname     : systemvg
+optlv      : opt_mqmlv
+varlv      : var_mqmlv
+tracelv    : trc_mqmlv
+errorslv   : err_mqmlv
+mqbin      : /opt/mqm
+mqdata     : /var/mqm
+mqtrace    : /var/mqm/trace
+mqerrors   : /var/mqm/errors
+optsize    : 1750m
+varsize    : 250m
+tracesize  : 500m
+errorssize : 500m
+filesystem : xfs
+mq_fixpack : U9001
+list_of_packages : "MQSeriesRuntime,
+                   MQSeriesClient,
+                   MQSeriesJava,
+                   MQSeriesJRE,
+                   MQSeriesMan,
+                   MQSeriesSamples,
+                   MQSeriesGSKit"
