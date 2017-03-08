@@ -1,0 +1,60 @@
+---
+# create /opt/mqm 
+- name: create LV {{ optlv }} 
+  lvol: vg={{ vgname }} lv={{ optlv }} size={{ opt_size }} shrink=no
+
+- name: create FS {{ mqbin }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ optlv }}
+
+- name: mount {{ mqbin }}
+  mount: name={{ mqbin }} src=/dev/{{ vgname }}/{{ optlv }} fstype={{ filesystem }} state=mounted
+
+# create /var/mqm
+- name: create LV {{ varlv }}
+  lvol: vg={{ vgname }} lv={{ varlv }} size={{ var_size }} shrink=no
+
+- name: create FS {{ mqdata }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ varlv }}
+
+- name: mount {{ mqdata }}
+  mount: name={{ mqdata }} src=/dev/{{ vgname }}/{{ varlv }} fstype={{ filesystem }} state=mounted
+
+# create /var/mqm/trace
+- name: create LV {{ tracelv }}
+  lvol: vg={{ vgname }} lv={{ tracelv }} size={{ trc_size }} shrink=no
+
+- name: create FS {{ mqtrace }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ tracelv }}
+
+- name: mount {{ mqtrace }}
+  mount: name={{ mqtrace }} src=/dev/{{ vgname }}/{{ tracelv }} fstype={{ filesystem }} state=mounted
+
+# create /var/mqm/errors
+- name: create LV {{ errorslv }}
+  lvol: vg={{ vgname }} lv={{ errorslv }} size={{ err_size }} shrink=no
+
+- name: create FS {{ mqerrors }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ errorslv }}
+
+- name: mount {{ mqerrrors }}
+  mount: name={{ mqerrors }} src=/dev/{{ vgname }}/{{ errorslv }} fstype={{ filesystem }} state=mounted
+
+- name: create mqm group
+  group: name={{ group }} gid={{ gid }} state=present
+
+- name: create user mqm
+  user: name={{ user }} uid={{ uid }} createhome=yes shell=/bin/ksh
+
+# accept MQ license
+- script: ./mqlicense.sh --accept state=present
+
+- name: install MQ9 packages
+  yum: name={{ item }} state=present
+  with_items:
+    - MQSeriesRuntime
+    - MQSeriesClient
+    - MQSeriesJava
+    - MQSeriesJRE
+    - MQSeriesMan
+    - MQSeriesSamples
+    - MQSeriesGSKit
