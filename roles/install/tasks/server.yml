@@ -1,0 +1,33 @@
+---
+- name: Install MQ Server baseline
+  yum: name={{ item }} state=present
+  with_items:
+    - MQSeriesServer
+
+- name: Setting primary installation
+  shell: name={{ item }}
+  with_items:
+    - "/opt/mqm/bin/setmqinst -i -n Installation1 > /dev/null 2>&1"
+    - "/opt/mqm/bin/setmqinst -i -p /opt/mqm > /dev/null 2>&1"
+
+- name: Setting system limits for MQ
+  pam_limits: name={{ item }} state=present
+  with_items:
+    - domain=mqm limit_type=hard limit_item=nofile value=10240
+    - domain=mqm limit_type=soft limit_item=nofile value=10240
+
+- name: Setting file-max for MQ
+  sysctl: name={{ item }} reload=yes state=present
+  with_items:
+    - name=fs.file-max value=524288
+    - name=kernel.threads-max value=32768
+    - name=vm.overcommit_memory value=2
+
+- name: Setting PATH for mqm
+  become_user: mqm
+  shell: echo 'export PATH=$PATH:/opt/mqm/bin' >> ~/.profile
+
+- name: Create queue manager
+  shell: /opt/mqm/bin/crtmqm -D -q TEST -s 1024
+
+- service: name=mqm.service state=started
