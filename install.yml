@@ -1,6 +1,0 @@
-- hosts: localhost
-  become: yes
-  roles: 
-    - role: install
-      install_client: false
-      install_server: false
