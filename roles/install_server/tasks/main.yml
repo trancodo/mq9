@@ -1,0 +1,13 @@
+- include_vars: file=../../common/defaults/main.yml
+- include: ../../common/tasks/main.yml
+- name: installing MQ Server baseline
+  yum: name={{ item }} state=present
+  with_items:
+    - MQSeriesRuntime
+    - MQSeriesClient
+    - MQSeriesJava
+    - MQSeriesJRE
+    - MQSeriesMan
+    - MQSeriesSamples
+    - MQSeriesGSKit
+    - MQSeriesServer
