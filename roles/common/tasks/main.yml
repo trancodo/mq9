@@ -1,0 +1,39 @@
+---
+- name: create LV {{ optlv }} in {{ vgname }}
+  lvol: vg={{ vgname }} lv={{ optlv }} size={{ optsize }} shrink=no
+
+- name: create FS {{ mqbin }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ optlv }}
+
+- name: mount {{ mqbin }}
+  mount: name={{ mqbin }} src=/dev/{{ vgname }}/{{ optlv }} fstype={{ filesystem }} state=mounted
+
+- name: create LV {{ varlv }} in {{ vgname }}
+  lvol: vg={{ vgname }} lv={{ varlv }} size={{ varsize }} shrink=no
+
+- name: create FS {{ mqdata }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ varlv }}
+
+- name: mount {{ mqdata }}
+  mount: name={{ mqdata }} src=/dev/{{ vgname }}/{{ varlv }} fstype={{ filesystem }} state=mounted
+
+- name: create LV {{ tracelv }} in {{ vgname }}
+  lvol: vg={{ vgname }} lv={{ tracelv }} size={{ tracesize }} shrink=no
+
+- name: create FS {{ mqtrace }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ tracelv }}
+
+- name: mount {{ mqtrace }}
+  mount: name={{ mqtrace }} src=/dev/{{ vgname }}/{{ tracelv }} fstype={{ filesystem }} state=mounted
+
+- name: create LV {{ errorslv }} in {{ vgname }}
+  lvol: vg={{ vgname }} lv={{ errorslv }} size={{ errorssize }} shrink=no
+
+- name: create FS {{ mqerrors }}
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ vgname }}/{{ errorslv }}
+
+- name: mount {{ mqerrors }}
+  mount: name={{ mqerrors }} src=/dev/{{ vgname }}/{{ errorslv }} fstype={{ filesystem }} state=mounted
+
+- name: accept MQ license
+  shell: ./mqlicense.sh -accept 
